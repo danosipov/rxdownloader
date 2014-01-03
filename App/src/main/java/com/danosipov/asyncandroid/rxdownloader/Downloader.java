@@ -97,6 +97,14 @@ public class Downloader extends Thread {
         killed = true;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isKilled() {
+        return killed;
+    }
+
     public Subject<DownloadProgressEvent, DownloadProgressEvent> getProgressObservable() {
         return progressSubject;
     }

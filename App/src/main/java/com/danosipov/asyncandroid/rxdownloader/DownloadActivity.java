@@ -63,6 +63,7 @@ public class DownloadActivity extends Activity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.fragment_download, container, false);
+            setRetainInstance(true);
 
             progressBar = ((ProgressBar) rootView.findViewById(R.id.downloadProgressBar));
             urlEditText = ((EditText) rootView.findViewById(R.id.urlEditText));
@@ -102,6 +103,18 @@ public class DownloadActivity extends Activity {
                             resetButton.setOnClickListener(handleReset);
                             Button downloadButton = ((Button) rootView.findViewById(R.id.downloadButton));
                             downloadButton.setOnClickListener(handleDownload);
+                            /**
+                             * Restore state of the views based on the fragment instance state
+                             * If not done, the center button stays in "download" state that
+                             * the view is initialized with
+                             */
+                            if (downloadThread != null) {
+                                if (downloadThread.isRunning() && !downloadThread.isKilled()) {
+                                    switchToPause(downloadButton);
+                                } else if (!downloadThread.isRunning() && !downloadThread.isKilled()) {
+                                    switchToResume(downloadButton);
+                                }
+                            }
 
                             return Subscriptions.empty();
                         }
@@ -156,7 +169,7 @@ public class DownloadActivity extends Activity {
             if (downloadThread != null && downloadThread.isAlive()) {
                 downloadThread.kill();
             }
-            switchToDownload(((Button) this.getView().findViewById(R.id.downloadButton)));
+            switchToDownload(((Button) getView().findViewById(R.id.downloadButton)));
         }
 
         private void switchToPause(Button downloadButton) {
