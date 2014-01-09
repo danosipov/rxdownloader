@@ -29,7 +29,6 @@ public class DownloadProgressEvent {
         return ((double) (loaded * 100)) / total;
     }
 
-
     /**
      * Thanks to helpful StackOverflow answer!
      * http://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java

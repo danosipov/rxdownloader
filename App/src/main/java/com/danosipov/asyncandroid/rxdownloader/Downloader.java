@@ -19,7 +19,6 @@ public class Downloader extends Thread {
     private String url;
     private long totalSize;
     private long loadedSize;
-    private rx.Observer<DownloadProgressEvent> progressObserver;
     private BehaviorSubject<DownloadProgressEvent> progressSubject;
 
     private volatile boolean running = true;
@@ -27,6 +26,7 @@ public class Downloader extends Thread {
 
     public Downloader(String url) {
         this.url = url;
+        // Seed the event stream with the first event.
         progressSubject = BehaviorSubject.create(new DownloadProgressEvent(0, 0));
     }
 

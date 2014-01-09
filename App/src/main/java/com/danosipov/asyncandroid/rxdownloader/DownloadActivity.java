@@ -39,7 +39,6 @@ public class DownloadActivity extends Activity {
                     .add(R.id.container, new DownloadFragment())
                     .commit();
         }
-
     }
 
     public static class DownloadFragment extends Fragment implements Observer<ClickEvent> {
@@ -69,7 +68,7 @@ public class DownloadActivity extends Activity {
             urlEditText = ((EditText) rootView.findViewById(R.id.urlEditText));
             downloadProgress = ((TextView) rootView.findViewById(R.id.downloadProgressTextView));
 
-            // See how to better handle this code:
+            // Create an observable, and set up OnClickListeners to post to it
             Observable<ClickEvent> clickObservable = Observable.create(
                     new Observable.OnSubscribeFunc<ClickEvent>() {
                         @Override
@@ -103,6 +102,7 @@ public class DownloadActivity extends Activity {
                             resetButton.setOnClickListener(handleReset);
                             Button downloadButton = ((Button) rootView.findViewById(R.id.downloadButton));
                             downloadButton.setOnClickListener(handleDownload);
+
                             /**
                              * Restore state of the views based on the fragment instance state
                              * If not done, the center button stays in "download" state that
@@ -120,6 +120,8 @@ public class DownloadActivity extends Activity {
                         }
                     });
 
+            // Subscribe to the click stream on the main UI thread.
+            // Receive the callbacks on the DownloadFragment
             clickSubscription = AndroidObservable.fromFragment(this, clickObservable)
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(this);
@@ -141,6 +143,10 @@ public class DownloadActivity extends Activity {
         public void answerDownloadStart(DownloadStartEvent event) {
             downloadThread = new Downloader(urlEditText.getText().toString());
             downloadThread.start();
+
+            // Subscribe to the progress observable
+            // Sample the stream every 30 milliseconds (ignore events in between)
+            // Upon receiving an event, update the views
             downloadThread.getProgressObservable()
                     .sample(30, java.util.concurrent.TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
