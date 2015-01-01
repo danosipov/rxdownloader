@@ -1,16 +1,16 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 19
+        targetSdkVersion 21
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:13.0.0'
-    compile group: 'com.netflix.rxjava', name: 'rxjava-core', version: '0.15.1'
-    compile group: 'com.netflix.rxjava', name: 'rxjava-android', version: '0.15.1'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile group: 'io.reactivex', name: 'rxjava', version: '1.0.4'
+    compile group: 'io.reactivex', name: 'rxandroid', version: '0.23.0'
 }
