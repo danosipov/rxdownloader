@@ -21,11 +21,11 @@ import com.danosipov.asyncandroid.rxdownloader.events.ResetEvent;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscriber;
 import rx.Subscription;
-import rx.android.concurrency.AndroidSchedulers;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.android.observables.AndroidObservable;
-import rx.subscriptions.Subscriptions;
-import rx.util.functions.Action1;
+import rx.functions.Action1;
 
 public class DownloadActivity extends Activity {
 
@@ -70,31 +70,31 @@ public class DownloadActivity extends Activity {
 
             // Create an observable, and set up OnClickListeners to post to it
             Observable<ClickEvent> clickObservable = Observable.create(
-                    new Observable.OnSubscribeFunc<ClickEvent>() {
+                    new Observable.OnSubscribe<ClickEvent>() {
                         @Override
-                        public Subscription onSubscribe(final Observer<? super ClickEvent> observer) {
+                        public void call(final Subscriber<? super ClickEvent> subscriber) {
                             handleReset = new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    observer.onNext(new ResetEvent(v));
+                                    subscriber.onNext(new ResetEvent(v));
                                 }
                             };
                             handleDownload = new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    observer.onNext(new DownloadStartEvent(v));
+                                    subscriber.onNext(new DownloadStartEvent(v));
                                 }
                             };
                             handlePause = new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    observer.onNext(new DownloadPauseEvent(v));
+                                    subscriber.onNext(new DownloadPauseEvent(v));
                                 }
                             };
                             handleResume = new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    observer.onNext(new DownloadResumeEvent(v));
+                                    subscriber.onNext(new DownloadResumeEvent(v));
                                 }
                             };
 
@@ -115,14 +115,12 @@ public class DownloadActivity extends Activity {
                                     switchToResume(downloadButton);
                                 }
                             }
-
-                            return Subscriptions.empty();
                         }
                     });
 
             // Subscribe to the click stream on the main UI thread.
             // Receive the callbacks on the DownloadFragment
-            clickSubscription = AndroidObservable.fromFragment(this, clickObservable)
+            clickSubscription = AndroidObservable.bindFragment(this, clickObservable)
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe(this);
 
